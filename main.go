@@ -54,6 +54,14 @@ func main() {
 	// Categories endpoint
 	api.Get("/categories", handlers.GetCategories)
 
+	// Meal Plan endpoints
+	api.Post("/meal-plans/suggest", handlers.SuggestMealPlan)
+	api.Post("/meal-plans/suggest-week", handlers.SuggestWeekMealPlan)
+	api.Post("/meal-plans/save", handlers.SaveMealPlan)
+	api.Get("/meal-plans/:sessionId", handlers.GetMealPlan)
+	api.Post("/meal-plans/:sessionId/export-pdf", handlers.ExportMealPlanPDF)
+	api.Post("/meal-plans/export-week-pdf", handlers.ExportWeekMealPlanPDF)
+
 	// Start server
 	port := os.Getenv("PORT")
 	if port == "" {

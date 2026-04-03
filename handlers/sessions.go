@@ -20,6 +20,7 @@ type UpdateSessionRequest struct {
 	Allergies        []string `json:"allergies"`
 	RestrictionsText string   `json:"restrictions_text"`
 	Restrictions     string   `json:"restrictions"`
+	TargetWeight     *float64 `json:"target_weight"`
 }
 
 func UpdateSession(c *fiber.Ctx) error {
@@ -56,12 +57,17 @@ func UpdateSession(c *fiber.Ctx) error {
 	}
 	if req.FitnessGoal != "" {
 		session.FitnessGoal = req.FitnessGoal
+		// Calculate daily calorie and macro targets based on fitness goal
+		session.DailyCalorieTarget, session.DailyProteinTarget, session.DailyCarbsTarget, session.DailyFatTarget = calculateNutritionTargets(req.FitnessGoal)
 	}
 	if req.DietType != "" {
 		session.DietType = req.DietType
 	}
 	if req.HeartRate > 0 {
 		session.HeartRate = req.HeartRate
+	}
+	if req.TargetWeight != nil {
+		session.TargetWeight = req.TargetWeight
 	}
 
 	allergyList := req.Allergies
@@ -118,4 +124,22 @@ func parseCSVList(raw string) []string {
 	}
 
 	return items
+}
+
+// calculateNutritionTargets returns daily calorie, protein, carbs, and fat targets based on fitness goal
+func calculateNutritionTargets(fitnessGoal string) (calories int, protein float64, carbs float64, fat float64) {
+	switch fitnessGoal {
+	case "lose":
+		// Weight loss: lower calories, high protein for satiety and muscle retention
+		return 1800, 120, 225, 60
+	case "maintain":
+		// Maintenance: balanced macros
+		return 2200, 150, 275, 73
+	case "build":
+		// Muscle building: higher calories, high protein for growth
+		return 2600, 195, 325, 87
+	default:
+		// Default: maintenance
+		return 2200, 150, 275, 73
+	}
 }

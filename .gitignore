@@ -1,3 +1,4 @@
 .env
 docs/
 schema.sql
+add_new_dishes.sql
